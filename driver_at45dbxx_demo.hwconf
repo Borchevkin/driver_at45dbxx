@@ -7,6 +7,19 @@
     <property object="HFXO" propertyId="ABPeripheral.included" value="true"/>
     <property object="HFXO" propertyId="hfxo.circuitcharacteristics.calculatedclpf" value="12.50"/>
     <property object="HFXO" propertyId="hfxo.result.rnegesrmaxratio" value="28.819"/>
+    <property object="PD0" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PD1" propertyId="ports.settings.pinmode" value="Input"/>
+    <property object="PD2" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PD3" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PE2" propertyId="ports.settings.custompinname" value="LED0"/>
+    <property object="PE2" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PE3" propertyId="ports.settings.custompinname" value="LED1"/>
+    <property object="PE3" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.clk" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.cs" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart1.location.usart1" value="1"/>
     <property object="USART1" propertyId="ABPeripheral.included" value="true"/>
   </mode>
   <modeTransition>

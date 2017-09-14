@@ -573,15 +573,47 @@ extern void PORTIO_enter_DefaultMode_from_RESET(void) {
 	// [Port C Configuration]$
 
 	// $[Port D Configuration]
+
+	/* Pin PD0 is configured to Push-pull */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE0_MASK)
+			| GPIO_P_MODEL_MODE0_PUSHPULL;
+
+	/* Pin PD1 is configured to Input enabled */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE1_MASK)
+			| GPIO_P_MODEL_MODE1_INPUT;
+
+	/* Pin PD2 is configured to Push-pull */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE2_MASK)
+			| GPIO_P_MODEL_MODE2_PUSHPULL;
+
+	/* Pin PD3 is configured to Push-pull */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE3_MASK)
+			| GPIO_P_MODEL_MODE3_PUSHPULL;
 	// [Port D Configuration]$
 
 	// $[Port E Configuration]
+
+	/* Pin PE2 is configured to Push-pull */
+	GPIO->P[4].MODEL = (GPIO->P[4].MODEL & ~_GPIO_P_MODEL_MODE2_MASK)
+			| GPIO_P_MODEL_MODE2_PUSHPULL;
+
+	/* Pin PE3 is configured to Push-pull */
+	GPIO->P[4].MODEL = (GPIO->P[4].MODEL & ~_GPIO_P_MODEL_MODE3_MASK)
+			| GPIO_P_MODEL_MODE3_PUSHPULL;
 	// [Port E Configuration]$
 
 	// $[Port F Configuration]
 	// [Port F Configuration]$
 
 	// $[Route Configuration]
+
+	/* Module USART1 is configured to location 1 */
+	USART1->ROUTE = (USART1->ROUTE & ~_USART_ROUTE_LOCATION_MASK)
+			| USART_ROUTE_LOCATION_LOC1;
+
+	/* Enable signals CLK, CS, RX, TX */
+	USART1->ROUTE |= USART_ROUTE_CLKPEN | USART_ROUTE_CSPEN | USART_ROUTE_RXPEN
+			| USART_ROUTE_TXPEN;
 	// [Route Configuration]$
 
 }
