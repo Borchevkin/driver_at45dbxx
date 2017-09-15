@@ -10,8 +10,18 @@
 #include "spidrv.h"
 #include "InitDevice.h"
 
+// Commands
 #define DEBUG_BREAK		__asm__("BKPT #0");
 #define JEDEC_ID_CMD	0x9F
+#define STATUS			0x05
+#define WR_ENABLE		0x06
+#define PAGE_PROGRAM	0x02
+#define CHIP_ERASE		0xC7
+#define READ_DATA		0x03
+
+// Bit positions for status register
+#define WIP_BIT			1 << 0
+#define WEL_BIT			1 << 1
 
 /* Counts 1ms timeTicks */
 volatile uint32_t msTicks = 0;
@@ -30,37 +40,118 @@ void SysTick_Handler(void)
       msTicks++;
 }
 
-void usart_setup()
+SPIDRV_HandleData_t handleData;
+SPIDRV_Handle_t handle = &handleData;
+
+
+#define PAGE_SIZE			256
+#define SPI_TRANSFER_SIZE 	PAGE_SIZE + 4  // Account for SPI header
+
+void spidrv_setup()
 {
 	// Set up the necessary peripheral clocks
 	CMU_ClockEnable(cmuClock_GPIO, true);
-	CMU_ClockEnable(cmuClock_USART1, true);
 
 	GPIO_DriveModeSet(gpioPortD, gpioDriveModeLow);
 
-	// Enable the GPIO pins for the USART, starting with CS
-	// This is to avoid clocking the flash chip when we set CLK high
-	GPIO_PinModeSet(USART1_CS_PORT, USART1_CS_PIN, gpioModePushPullDrive, 1);		// CS
-	GPIO_PinModeSet(USART1_TX_PORT, USART1_TX_PIN, gpioModePushPullDrive, 0);		// MOSI
-	GPIO_PinModeSet(USART1_RX_PORT, USART1_RX_PIN, gpioModeInput, 0);				// MISO
-	GPIO_PinModeSet(USART1_CLK_PORT, USART1_CLK_PIN, gpioModePushPullDrive, 1);		// CLK
-
 	// Enable the GPIO pins for the misc signals, leave pulled high
-	GPIO_PinModeSet(gpioPortD, 4, gpioModePushPullDrive, 1);		// WP#
-	GPIO_PinModeSet(gpioPortD, 5, gpioModePushPullDrive, 1);		// HOLD#
+	GPIO_PinModeSet(gpioPortD, 4, gpioModePushPullDrive, 1);          // WP#
+	GPIO_PinModeSet(gpioPortD, 5, gpioModePushPullDrive, 1);          // HOLD#
 
-	// Initialize and enable the USART
-	USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
-	init.clockMode = usartClockMode3;
-	init.msbf = true;
+	// Initialize and enable the SPIDRV
+	SPIDRV_Init_t initData = SPIDRV_MASTER_USART1;
+	initData.clockMode = spidrvClockMode3;
 
-	USART_InitSync(USART1, &init);
-
-	// Connect the USART signals to the GPIO peripheral
-	USART1->ROUTE = USART_ROUTE_RXPEN | USART_ROUTE_TXPEN |
-			USART_ROUTE_CLKPEN | USART_ROUTE_LOCATION_LOC1;
+	// Initialize a SPI driver instance
+	SPIDRV_Init( handle, &initData );
 }
 
+// Writes a single byte
+void config_write(uint8_t command)
+{
+	const int size = 1;
+	uint8_t result[size];
+	uint8_t tx_data[size];
+
+	tx_data[0] = command;
+
+	SPIDRV_MTransferB( handle, &tx_data, &result, size);
+}
+
+// Reads the status
+uint8_t read_status()
+{
+	const int size = 2;
+	uint8_t result[size];
+	uint8_t tx_data[size];
+
+	tx_data[0] = STATUS;
+
+	SPIDRV_MTransferB( handle, &tx_data, &result, size);
+	return result[1];
+}
+
+void chip_erase()
+{
+	uint8_t status;
+	config_write(WR_ENABLE);
+
+	status = read_status();
+	if (!(status & WEL_BIT))
+	{
+		DEBUG_BREAK
+	}
+
+	config_write(CHIP_ERASE);
+
+	do status = read_status();
+	while (status & WIP_BIT);
+}
+
+void read_memory(uint32_t address, uint8_t result[], uint32_t num_of_bytes)
+{
+	uint8_t tx_data[SPI_TRANSFER_SIZE];
+	uint8_t rx_data[SPI_TRANSFER_SIZE];
+
+	tx_data[0] = READ_DATA;
+	tx_data[1] = (address >> 16);
+	tx_data[2] = (address >> 8);
+	tx_data[3] = address;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, SPI_TRANSFER_SIZE);
+
+	// Fill the result from the right index
+	for (int i=0; i< PAGE_SIZE; i++)
+	{
+		result[i] = rx_data[i+4];
+	}
+}
+
+void write_memory(uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes)
+{
+	if (num_of_bytes > PAGE_SIZE) DEBUG_BREAK
+
+	uint8_t status;
+	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
+	uint8_t tx_data[SPI_TRANSFER_SIZE];  // Need room for cmd + three address bytes
+
+	tx_data[0] = PAGE_PROGRAM;
+	tx_data[1] = (address >> 16);
+	tx_data[2] = (address >> 8);
+	tx_data[3] = address;
+
+	for (int i=0; i < PAGE_SIZE; i++)
+	{
+		if (i >= num_of_bytes) break;
+		tx_data[i+4] = data_buffer[i];
+	}
+
+	config_write(WR_ENABLE);
+	SPIDRV_MTransferB( handle, &tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
+
+	do 	status = read_status();
+	while (status & WIP_BIT);
+}
 
 /**************************************************************************//**
  * @brief  Main function
@@ -69,7 +160,7 @@ int main(void)
 {
 	CHIP_Init();
 
-	usart_setup();
+	spidrv_setup();
 
 	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
 	{
@@ -88,27 +179,37 @@ int main(void)
 
 	Delay(100);
 
-	uint8_t result[3];
-	uint8_t index = 0;
+	uint8_t result[PAGE_SIZE];
+	uint8_t tx_data[PAGE_SIZE];
 
-	GPIO_PinModeSet(USART1_CS_PORT, USART1_CS_PIN, gpioModePushPullDrive, 0);
 
-	// Send the command, discard the first response
-	USART_SpiTransfer(USART1, JEDEC_ID_CMD);
+	tx_data[0] = JEDEC_ID_CMD;
 
-	// Now send garbage, but keep the results
-	result[index++] = USART_SpiTransfer(USART1, 0);
-	result[index++] = USART_SpiTransfer(USART1, 0);
-	result[index++] = USART_SpiTransfer(USART1, 0);
+	SPIDRV_MTransferB( handle, &tx_data, &result, 4);
 
-	GPIO_PinModeSet(USART1_CS_PORT, USART1_CS_PIN, gpioModePushPullDrive, 1);
 
 	// Check the result for what is expected from the Spansion spec
-	if (result[0] != 0x1F && result[1] != 0x24 && result[2] != 0x00)
+	if (result[1] != 0x1F || result[2] != 0x24 || result[3] != 0x00)
 	{
 		DEBUG_BREAK
 	}
 
-	while (1)
-		;
+	// Never enter here except with debugger and “Move to Line”
+	if (result[1] == 0x20)
+	{
+		for (int i=0; i < 256; i++) tx_data[i] = i;
+
+		chip_erase();
+		read_memory(0, result, PAGE_SIZE);
+		write_memory(0, tx_data, PAGE_SIZE);
+		read_memory(0, result, PAGE_SIZE);
+	}
+
+
+	read_memory(0, result, PAGE_SIZE);
+
+	while (1){
+		read_memory(0, result, PAGE_SIZE);
+		Delay(1000);
+	}
 }
