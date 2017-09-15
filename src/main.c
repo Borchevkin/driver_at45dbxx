@@ -97,14 +97,14 @@ int main(void)
 	USART_SpiTransfer(USART1, JEDEC_ID_CMD);
 
 	// Now send garbage, but keep the results
-	result[index++] = USART_SpiTransfer(USART1, 1);
-	result[index++] = USART_SpiTransfer(USART1, 2);
-	result[index++] = USART_SpiTransfer(USART1, 3);
+	result[index++] = USART_SpiTransfer(USART1, 0);
+	result[index++] = USART_SpiTransfer(USART1, 0);
+	result[index++] = USART_SpiTransfer(USART1, 0);
 
 	GPIO_PinModeSet(USART1_CS_PORT, USART1_CS_PIN, gpioModePushPullDrive, 1);
 
 	// Check the result for what is expected from the Spansion spec
-	if (result[0] != 1 || result[1] != 0x40 || result[2] != 0x13)
+	if (result[0] != 0x1F && result[1] != 0x24 && result[2] != 0x00)
 	{
 		DEBUG_BREAK
 	}
