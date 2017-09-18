@@ -15,9 +15,12 @@
 #define JEDEC_ID_CMD	0x9F
 #define STATUS			0x05
 #define WR_ENABLE		0x06
-#define PAGE_PROGRAM	0x02
+#define PAGE_PROGRAM	0x82
 #define CHIP_ERASE		0xC7
 #define READ_DATA		0x03
+
+#define PAGE_SIZE			256
+#define SPI_TRANSFER_SIZE 	PAGE_SIZE + 4  // Account for SPI header
 
 // Bit positions for status register
 #define WIP_BIT			1 << 0
@@ -43,10 +46,6 @@ void SysTick_Handler(void)
 SPIDRV_HandleData_t handleData;
 SPIDRV_Handle_t handle = &handleData;
 
-
-#define PAGE_SIZE			256
-#define SPI_TRANSFER_SIZE 	PAGE_SIZE + 4  // Account for SPI header
-
 void spidrv_setup()
 {
 	// Set up the necessary peripheral clocks
@@ -56,7 +55,7 @@ void spidrv_setup()
 
 	// Enable the GPIO pins for the misc signals, leave pulled high
 	GPIO_PinModeSet(gpioPortD, 4, gpioModePushPullDrive, 1);          // WP#
-	GPIO_PinModeSet(gpioPortD, 5, gpioModePushPullDrive, 1);          // HOLD#
+	GPIO_PinModeSet(gpioPortD, 5, gpioModePushPullDrive, 1);          // RESET#
 
 	// Initialize and enable the SPIDRV
 	SPIDRV_Init_t initData = SPIDRV_MASTER_USART1;
@@ -108,10 +107,27 @@ void chip_erase()
 	while (status & WIP_BIT);
 }
 
+void chip_erase_test()
+{
+	uint8_t tx_data[4];
+	memset(tx_data,0x00,4);
+	uint8_t rx_data[4];
+	memset(rx_data,0x00,4);
+
+	tx_data[0] = 0xC7;
+	tx_data[1] = 0x94;
+	tx_data[2] = 0x80;
+	tx_data[3] = 0x9A;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+}
+
 void read_memory(uint32_t address, uint8_t result[], uint32_t num_of_bytes)
 {
 	uint8_t tx_data[SPI_TRANSFER_SIZE];
+	memset(tx_data,0x00,SPI_TRANSFER_SIZE);
 	uint8_t rx_data[SPI_TRANSFER_SIZE];
+	memset(rx_data,0x00,SPI_TRANSFER_SIZE);
 
 	tx_data[0] = READ_DATA;
 	tx_data[1] = (address >> 16);
@@ -121,10 +137,13 @@ void read_memory(uint32_t address, uint8_t result[], uint32_t num_of_bytes)
 	SPIDRV_MTransferB( handle, &tx_data, &rx_data, SPI_TRANSFER_SIZE);
 
 	// Fill the result from the right index
+	/*
 	for (int i=0; i< PAGE_SIZE; i++)
 	{
 		result[i] = rx_data[i+4];
 	}
+	*/
+	memcpy(result,rx_data + 4,PAGE_SIZE);
 }
 
 void write_memory(uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes)
@@ -146,13 +165,27 @@ void write_memory(uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes
 		tx_data[i+4] = data_buffer[i];
 	}
 
-	config_write(WR_ENABLE);
+	//config_write(WR_ENABLE);
 	SPIDRV_MTransferB( handle, &tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
 
-	do 	status = read_status();
-	while (status & WIP_BIT);
+	//do 	status = read_status();
+	//while (status & WIP_BIT);
 }
 
+void write_memory_test()
+{
+	uint8_t tx_data[SPI_TRANSFER_SIZE];
+	memset(tx_data,0xAA,SPI_TRANSFER_SIZE);
+	uint8_t rx_data[SPI_TRANSFER_SIZE];
+	memset(rx_data,0x00,SPI_TRANSFER_SIZE);
+
+	tx_data[0] = 0x82;
+	tx_data[1] = 0 >> 16;
+	tx_data[2] = 0 >> 8;
+	tx_data[3] = 0;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, SPI_TRANSFER_SIZE);
+}
 /**************************************************************************//**
  * @brief  Main function
  *****************************************************************************/
@@ -182,6 +215,8 @@ int main(void)
 	uint8_t result[PAGE_SIZE];
 	uint8_t tx_data[PAGE_SIZE];
 
+	memset(tx_data,0x00,PAGE_SIZE);
+	memset(result,0x00,PAGE_SIZE);
 
 	tx_data[0] = JEDEC_ID_CMD;
 
@@ -206,10 +241,21 @@ int main(void)
 	}
 
 
+	chip_erase_test();
+
+	Delay(10000);
+
+	memset(tx_data,0xcb,PAGE_SIZE);
+
+	write_memory(0, tx_data, PAGE_SIZE);
+
+	//write_memory_test();
+
 	read_memory(0, result, PAGE_SIZE);
 
 	while (1){
+		//memset(result,0x00,PAGE_SIZE);
 		read_memory(0, result, PAGE_SIZE);
-		Delay(1000);
+		Delay(500);
 	}
 }
