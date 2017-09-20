@@ -5,8 +5,6 @@
  *      Author: user
  */
 
-
-
 #include <stdint.h>
 #include "em_usart.h"
 #include "em_gpio.h"
@@ -31,7 +29,6 @@ void Delay(uint32_t dlyTicks)
 
 void SysTick_Handler(void)
 {
-      /* Increment counter necessary in Delay()*/
       msTicks++;
 }
 

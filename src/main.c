@@ -38,22 +38,26 @@ int main(void)
 	memset(tx_data,0x00,PAGE_SIZE);
 	memset(result,0x00,PAGE_SIZE);
 
-	void AT45DBXX_CheckID(at45dbxx_t * at45dbxx);
+	AT45DBXX_CheckID(&at45dbxx);
 
 	// ================ TEST FIELD
+
+	Delay(1000);
 
 	AT45DBXX_ChipErase(&at45dbxx);
 
 	Delay(10000);
 
-	memset(tx_data,0x95,PAGE_SIZE);
+	memset(tx_data,0xBC,PAGE_SIZE);
 
 	AT45DBXX_WriteMemory(&at45dbxx, 0, tx_data, PAGE_SIZE);
+
+	Delay(1000);
 
 	AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
 
 	while (1){
-		AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
 		Delay(1000);
+		AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
 	}
 }

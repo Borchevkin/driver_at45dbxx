@@ -23,7 +23,7 @@
 /* ==========TYPES========== */
 
 typedef struct {
-
+//TODO
 }at45dbxx_t;
 
 /* ==========PROTOTYPES========== */
@@ -34,6 +34,7 @@ void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_
 void AT45DBXX_ConfigWrite(at45dbxx_t * at45dbxx, uint8_t command);
 void AT45DBXX_CheckID(at45dbxx_t * at45dbxx);
 
+//Need to replace it somewhere
 void spidrv_setup();
 
 #endif /* INC_DRIVER_AT45DBXX_H_ */
