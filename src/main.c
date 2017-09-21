@@ -46,18 +46,12 @@ int main(void)
 
 	AT45DBXX_ChipErase(&at45dbxx);
 
-	Delay(10000);
-
-	memset(tx_data,0xBC,PAGE_SIZE);
+	memset(tx_data,0xA5,PAGE_SIZE);
 
 	AT45DBXX_WriteMemory(&at45dbxx, 0, tx_data, PAGE_SIZE);
 
-	Delay(1000);
-
-	AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
-
 	while (1){
-		Delay(1000);
 		AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
+		Delay(1000);
 	}
 }

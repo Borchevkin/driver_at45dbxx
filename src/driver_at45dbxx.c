@@ -41,6 +41,7 @@ void spidrv_setup()
 
 void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx)
 {
+	uint8_t status;
 	uint8_t tx_data[4];
 	memset(tx_data,0x00,4);
 	uint8_t rx_data[4];
@@ -52,6 +53,9 @@ void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx)
 	tx_data[3] = 0x9A;
 
 	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+
+	do status = AT45DBXX_ReadStatus(at45dbxx);
+	while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result[], uint32_t num_of_bytes)
@@ -76,6 +80,7 @@ void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_
 {
 	if (num_of_bytes > PAGE_SIZE) DEBUG_BREAK
 
+	uint8_t status;
 	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
 	uint8_t tx_data[SPI_TRANSFER_SIZE];  // Need room for cmd + three address bytes
 
@@ -91,26 +96,30 @@ void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_
 	}
 
 	SPIDRV_MTransferB( handle, &tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
+
+	do status = AT45DBXX_ReadStatus(at45dbxx);
+	while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ConfigWrite(at45dbxx_t * at45dbxx, uint8_t command)
 {
-	const int size = 1;
-	uint8_t result[size];
-	uint8_t tx_data[size];
+	uint8_t result[1];
+	uint8_t tx_data[1];
+	memset(tx_data,0x00,1);
+	memset(result,0x00,1);
 
 	tx_data[0] = command;
 
-	SPIDRV_MTransferB( handle, &tx_data, &result, size);
+	SPIDRV_MTransferB( handle, &tx_data, &result, 1);
 }
 
 void AT45DBXX_CheckID(at45dbxx_t * at45dbxx)
 {
-	uint8_t result[PAGE_SIZE];
-	uint8_t tx_data[PAGE_SIZE];
+	uint8_t result[4];
+	uint8_t tx_data[4];
 
-	memset(tx_data,0x00,PAGE_SIZE);
-	memset(result,0x00,PAGE_SIZE);
+	memset(tx_data,0x00,4);
+	memset(result,0x00,4);
 
 	tx_data[0] = JEDEC_ID_CMD;
 
@@ -121,4 +130,19 @@ void AT45DBXX_CheckID(at45dbxx_t * at45dbxx)
 	{
 		DEBUG_BREAK
 	}
+}
+
+uint8_t AT45DBXX_ReadStatus(at45dbxx_t * at45dbxx)
+{
+	uint8_t result[2];
+	uint8_t tx_data[2];
+
+	memset(tx_data,0x00,2);
+	memset(result,0x00,2);
+
+	tx_data[0] = STATUS;
+
+	SPIDRV_MTransferB( handle, &tx_data, &result, 2);
+
+	return result[1];
 }
