@@ -44,14 +44,27 @@ int main(void)
 
 	Delay(1000);
 
+	/*
 	AT45DBXX_ChipErase(&at45dbxx);
 
-	memset(tx_data,0xA5,PAGE_SIZE);
+	memset(tx_data,0xAC,PAGE_SIZE);
 
-	AT45DBXX_WriteMemory(&at45dbxx, 0, tx_data, PAGE_SIZE);
+	AT45DBXX_WriteMemory(&at45dbxx, 1, tx_data, PAGE_SIZE);
 
+	memset(tx_data,0xBA,PAGE_SIZE);
+
+	AT45DBXX_WriteMemory(&at45dbxx, 2, tx_data, PAGE_SIZE);
+
+	memset(tx_data,0xCC,PAGE_SIZE);
+
+	AT45DBXX_WriteMemory(&at45dbxx, 3, tx_data, PAGE_SIZE);
+
+	memset(tx_data,0x88,PAGE_SIZE);
+
+	AT45DBXX_WriteMemory(&at45dbxx, 4, tx_data, PAGE_SIZE);
+	*/
 	while (1){
-		AT45DBXX_ReadMemory(&at45dbxx, 0, result, PAGE_SIZE);
+		AT45DBXX_ReadMemory(&at45dbxx, 1, result);
 		Delay(1000);
 	}
 }

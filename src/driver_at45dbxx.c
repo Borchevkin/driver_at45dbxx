@@ -54,26 +54,29 @@ void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx)
 
 	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
 
+	//TODO Make non-block
 	do status = AT45DBXX_ReadStatus(at45dbxx);
 	while (!(status & STATUS_RDY));
 }
 
-void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result[], uint32_t num_of_bytes)
+void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result[])
 {
 	uint8_t tx_data[SPI_TRANSFER_SIZE];
 	memset(tx_data,0x00,SPI_TRANSFER_SIZE);
 	uint8_t rx_data[SPI_TRANSFER_SIZE];
 	memset(rx_data,0x00,SPI_TRANSFER_SIZE);
 
+	uint32_t page = address << 8;
+
 	tx_data[0] = READ_DATA;
-	tx_data[1] = (address >> 16);
-	tx_data[2] = (address >> 8);
-	tx_data[3] = address;
+	tx_data[1] = (page >> 16)	& 0xff;
+	tx_data[2] = (page >> 8)	& 0xff;
+	tx_data[3] = page			& 0xff;
 
 	SPIDRV_MTransferB( handle, &tx_data, &rx_data, SPI_TRANSFER_SIZE);
 
 	// Fill the result from the right index
-	memcpy(result,rx_data + 4,PAGE_SIZE);
+	memcpy(result,rx_data+4,PAGE_SIZE);
 }
 
 void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes)
@@ -84,10 +87,15 @@ void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_
 	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
 	uint8_t tx_data[SPI_TRANSFER_SIZE];  // Need room for cmd + three address bytes
 
+	memset(tx_data,0x00,SPI_TRANSFER_SIZE);
+	memset(dummy_rx,0x00,SPI_TRANSFER_SIZE);
+
+	uint32_t page = address << 8;
+
 	tx_data[0] = PAGE_PROGRAM;
-	tx_data[1] = (address >> 16);
-	tx_data[2] = (address >> 8);
-	tx_data[3] = address;
+	tx_data[1] = (page >> 16)	& 0xff;
+	tx_data[2] = (page >> 8)	& 0xff;
+	tx_data[3] = page			& 0xff;
 
 	for (int i=0; i < PAGE_SIZE; i++)
 	{
