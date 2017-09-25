@@ -43,28 +43,27 @@ int main(void)
 	// ================ TEST FIELD
 
 	Delay(1000);
-
 	/*
 	AT45DBXX_ChipErase(&at45dbxx);
 
-	memset(tx_data,0xAC,PAGE_SIZE);
+	memset(tx_data,0xBC,PAGE_SIZE);
 
 	AT45DBXX_WriteMemory(&at45dbxx, 1, tx_data, PAGE_SIZE);
 
-	memset(tx_data,0xBA,PAGE_SIZE);
+	memset(tx_data,0xCD,PAGE_SIZE);
 
 	AT45DBXX_WriteMemory(&at45dbxx, 2, tx_data, PAGE_SIZE);
 
-	memset(tx_data,0xCC,PAGE_SIZE);
+	memset(tx_data,0xDE,PAGE_SIZE);
 
 	AT45DBXX_WriteMemory(&at45dbxx, 3, tx_data, PAGE_SIZE);
-
-	memset(tx_data,0x88,PAGE_SIZE);
-
-	AT45DBXX_WriteMemory(&at45dbxx, 4, tx_data, PAGE_SIZE);
 	*/
-	while (1){
+	for(int i = 0; i < 2; i++){
 		AT45DBXX_ReadMemory(&at45dbxx, 1, result);
-		Delay(1000);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 2, result);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 3, result);
+		Delay(500);
 	}
 }
