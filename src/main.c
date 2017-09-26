@@ -44,21 +44,46 @@ int main(void)
 
 	Delay(1000);
 
-	memset(tx_data,0xAA,PAGE_SIZE);
 
-	AT45DBXX_BufferWrite(&at45dbxx,1,tx_data,PAGE_SIZE);
-
-	memset(tx_data,0xBB,PAGE_SIZE);
-
-	AT45DBXX_BufferWrite(&at45dbxx,2,tx_data,PAGE_SIZE);
-
-	AT45DBXX_BufferRead(&at45dbxx, 1,result);
-
-	AT45DBXX_BufferRead(&at45dbxx, 2,result);
+	while(1){
+		AT45DBXX_ReadMemory(&at45dbxx, 1, result);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 2, result);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 3, result);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 4, result);
+		Delay(500);
+		AT45DBXX_ReadMemory(&at45dbxx, 5, result);
+		Delay(500);
+	}
 }
 
 
 /* ==================== Test section
+ memset(tx_data,0xAA,PAGE_SIZE);
+
+AT45DBXX_BufferWrite(&at45dbxx,1,tx_data,PAGE_SIZE);
+
+memset(tx_data,0xBB,PAGE_SIZE);
+
+AT45DBXX_BufferWrite(&at45dbxx,2,tx_data,PAGE_SIZE);
+
+AT45DBXX_BufferRead(&at45dbxx, 1,result);
+
+AT45DBXX_BufferRead(&at45dbxx, 2,result);
+
+AT45DBXX_BufferToPageER(&at45dbxx, 1, 1);
+
+AT45DBXX_BufferToPageER(&at45dbxx, 2, 2);
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
 AT45DBXX_ChipErase(&at45dbxx);
 
 memset(tx_data,0xBC,PAGE_SIZE);

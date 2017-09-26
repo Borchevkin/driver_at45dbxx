@@ -229,3 +229,109 @@ void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_bu
 
 	SPIDRV_MTransferB( handle, &tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
 }
+
+void AT45DBXX_BufferToPageER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
+{
+	uint8_t status;
+
+	uint8_t tx_data[4];
+	memset(tx_data,0x00,4);
+	uint8_t rx_data[4];
+	memset(rx_data,0x00,4);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = BUF_1_PAGE_ER;
+	if (number == 2)buff = BUF_2_PAGE_ER;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	uint32_t page = address << 1;
+
+	tx_data[0] = buff;
+	tx_data[1] = (page >> 8)	& 0xff;
+	tx_data[2] = (page)			& 0xff;
+	tx_data[3] = 0; //page			& 0xff;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+
+	//TODO Make non-block
+	do status = AT45DBXX_ReadStatus(at45dbxx);
+	while (!(status & STATUS_RDY));
+}
+
+void AT45DBXX_BufferToPageNER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
+{
+	uint8_t status;
+
+	uint8_t tx_data[4];
+	memset(tx_data,0x00,4);
+	uint8_t rx_data[4];
+	memset(rx_data,0x00,4);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = BUF_1_PAGE_NER;
+	if (number == 2)buff = BUF_2_PAGE_NER;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	uint32_t page = address << 1;
+
+	tx_data[0] = buff;
+	tx_data[1] = (page >> 8)	& 0xff;
+	tx_data[2] = (page)			& 0xff;
+	tx_data[3] = 0; //page			& 0xff;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+
+	//TODO Make non-block
+	do status = AT45DBXX_ReadStatus(at45dbxx);
+	while (!(status & STATUS_RDY));
+}
+
+void AT45DBXX_PageToBufferTransfer(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
+{
+	uint8_t tx_data[4];
+	memset(tx_data,0x00,4);
+	uint8_t rx_data[4];
+	memset(rx_data,0x00,4);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = PAGE_TO_BUF_1;
+	if (number == 2)buff = PAGE_TO_BUF_2;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	uint32_t page = address << 1;
+
+	tx_data[0] = buff;
+	tx_data[1] = (page >> 8)	& 0xff;
+	tx_data[2] = (page)			& 0xff;
+	tx_data[3] = 0; //page			& 0xff;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+}
+
+void AT45DBXX_PageToBufferCompare(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
+{
+	uint8_t status;
+
+	uint8_t tx_data[4];
+	memset(tx_data,0x00,4);
+	uint8_t rx_data[4];
+	memset(rx_data,0x00,4);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = BUF_1_COMP;
+	if (number == 2)buff = BUF_2_COMP;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	uint32_t page = address << 1;
+
+	tx_data[0] = buff;
+	tx_data[1] = (page >> 8)	& 0xff;
+	tx_data[2] = (page)			& 0xff;
+	tx_data[3] = 0; //page			& 0xff;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, 4);
+
+	//TODO Make non-block
+	do status = AT45DBXX_ReadStatus(at45dbxx);
+	while (!(status & STATUS_RDY));
+}

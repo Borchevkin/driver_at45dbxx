@@ -49,8 +49,14 @@ typedef struct {
 /* ==========PROTOTYPES========== */
 
 void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx);
+
 void AT45DBXX_BufferRead(at45dbxx_t * at45dbxx, uint8_t number, uint8_t result[]);
 void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_buffer[], uint32_t num_of_bytes);
+void AT45DBXX_BufferToPageER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address);
+void AT45DBXX_BufferToPageNER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address);
+void AT45DBXX_PageToBufferTransfer(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address);
+void AT45DBXX_PageToBufferCompare(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address);
+
 void AT45DBXX_PageErase(at45dbxx_t * at45dbxx, uint32_t address);
 void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result[]);
 void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes);
