@@ -177,3 +177,55 @@ uint8_t AT45DBXX_ReadStatus(at45dbxx_t * at45dbxx)
 
 	return result[1];
 }
+
+void AT45DBXX_BufferRead(at45dbxx_t * at45dbxx, uint8_t number, uint8_t result[])
+{
+	uint8_t tx_data[SPI_TRANSFER_SIZE];
+	memset(tx_data,0x00,SPI_TRANSFER_SIZE);
+	uint8_t rx_data[SPI_TRANSFER_SIZE];
+	memset(rx_data,0x00,SPI_TRANSFER_SIZE);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = BUF_1_READ;
+	if (number == 2)buff = BUF_2_READ;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	tx_data[0] = buff;
+	tx_data[1] = 0;
+	tx_data[2] = 0;
+	tx_data[3] = 0;
+
+	SPIDRV_MTransferB( handle, &tx_data, &rx_data, SPI_TRANSFER_SIZE);
+
+	// Fill the result from the right index
+	memcpy(result,rx_data+4,PAGE_SIZE);
+}
+
+void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_buffer[], uint32_t num_of_bytes)
+{
+	if (num_of_bytes > PAGE_SIZE) DEBUG_BREAK
+
+	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
+	uint8_t tx_data[SPI_TRANSFER_SIZE];  // Need room for cmd + three address bytes
+
+	memset(tx_data,0x00,SPI_TRANSFER_SIZE);
+	memset(dummy_rx,0x00,SPI_TRANSFER_SIZE);
+
+	uint8_t buff = 0;
+	if (number == 1)buff = BUF_1_WRITE;
+	if (number == 2)buff = BUF_2_WRITE;
+	if (number < 1 || number > 2) DEBUG_BREAK
+
+	tx_data[0] = buff;
+	tx_data[1] = 0;
+	tx_data[2] = 0;
+	tx_data[3] = 0;
+
+	for (int i=0; i < PAGE_SIZE; i++)
+	{
+		if (i >= num_of_bytes) break;
+		tx_data[i+4] = data_buffer[i];
+	}
+
+	SPIDRV_MTransferB( handle, &tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
+}
