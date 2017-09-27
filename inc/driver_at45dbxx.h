@@ -43,10 +43,17 @@
 /* ==========TYPES========== */
 
 typedef struct {
-//TODO
+	void (*SetWP)(void);
+	void (*ClearWP)(void);
+	void (*SetRESET)(void);
+	void (*ClearRESET)(void);
+	void (*SetupSPI)(void);
+	void (*Transfer)(uint8_t *tx, uint8_t *rx, uint16_t num);
 }at45dbxx_t;
 
 /* ==========PROTOTYPES========== */
+
+void AT45DBXX_Init(at45dbxx_t * at45dbxx);
 
 void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx);
 
@@ -64,7 +71,10 @@ void AT45DBXX_ConfigWrite(at45dbxx_t * at45dbxx, uint8_t command);
 void AT45DBXX_CheckID(at45dbxx_t * at45dbxx);
 uint8_t AT45DBXX_ReadStatus(at45dbxx_t * at45dbxx);
 
-//Need to replace it somewhere
-void spidrv_setup();
+void AT45DBXX_EnableSectorProtection(at45dbxx_t * at45dbxx);
+void AT45DBXX_DisableSectorProtection(at45dbxx_t * at45dbxx);
+void AT45DBXX_EraseSectorProtection(at45dbxx_t * at45dbxx);
+void AT45DBXX_ProgramSectorProtection(at45dbxx_t * at45dbxx, uint8_t sector);
+void AT45DBXX_ReadSectorProtection(at45dbxx_t * at45dbxx);
 
 #endif /* INC_DRIVER_AT45DBXX_H_ */

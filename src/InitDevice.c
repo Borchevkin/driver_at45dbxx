@@ -589,6 +589,14 @@ extern void PORTIO_enter_DefaultMode_from_RESET(void) {
 	/* Pin PD3 is configured to Push-pull */
 	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE3_MASK)
 			| GPIO_P_MODEL_MODE3_PUSHPULL;
+
+	/* Pin PD4 is configured to Push-pull with alt. drive strength */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE4_MASK)
+			| GPIO_P_MODEL_MODE4_PUSHPULLDRIVE;
+
+	/* Pin PD5 is configured to Push-pull with alt. drive strength */
+	GPIO->P[3].MODEL = (GPIO->P[3].MODEL & ~_GPIO_P_MODEL_MODE5_MASK)
+			| GPIO_P_MODEL_MODE5_PUSHPULLDRIVE;
 	// [Port D Configuration]$
 
 	// $[Port E Configuration]

@@ -11,6 +11,10 @@
     <property object="PD1" propertyId="ports.settings.pinmode" value="Input"/>
     <property object="PD2" propertyId="ports.settings.pinmode" value="Push-pull"/>
     <property object="PD3" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PD4" propertyId="ports.settings.custompinname" value="WP"/>
+    <property object="PD4" propertyId="ports.settings.pinmode" value="Push-pull drive"/>
+    <property object="PD5" propertyId="ports.settings.custompinname" value="RESET"/>
+    <property object="PD5" propertyId="ports.settings.pinmode" value="Push-pull drive"/>
     <property object="PE2" propertyId="ports.settings.custompinname" value="LED0"/>
     <property object="PE2" propertyId="ports.settings.pinmode" value="Push-pull"/>
     <property object="PE3" propertyId="ports.settings.custompinname" value="LED1"/>

@@ -28,7 +28,9 @@ int main(void)
 		DEBUG_BREAK;
 	}
 
-	SetupUtilities();
+	Setup_Utilities();
+
+	AT45DBXX_Init(&at45dbxx);
 
 	Delay(100);
 
@@ -40,10 +42,23 @@ int main(void)
 
 	AT45DBXX_CheckID(&at45dbxx);
 
-	// ================ TEST FIELD
-
 	Delay(1000);
 
+	// ================ TEST FIELD
+	/*
+	AT45DBXX_EraseSectorProtection(&at45dbxx);
+
+	AT45DBXX_ProgramSectorProtection(&at45dbxx);
+
+	FLASH_ClearWP();
+
+	memset(tx_data,0x22,PAGE_SIZE);
+
+	AT45DBXX_WriteMemory(&at45dbxx, 1, tx_data, PAGE_SIZE);
+
+	AT45DBXX_PageErase(&at45dbxx, 2);
+	*/
+	// ===========================
 
 	while(1){
 		AT45DBXX_ReadMemory(&at45dbxx, 1, result);
@@ -58,52 +73,3 @@ int main(void)
 		Delay(500);
 	}
 }
-
-
-/* ==================== Test section
- memset(tx_data,0xAA,PAGE_SIZE);
-
-AT45DBXX_BufferWrite(&at45dbxx,1,tx_data,PAGE_SIZE);
-
-memset(tx_data,0xBB,PAGE_SIZE);
-
-AT45DBXX_BufferWrite(&at45dbxx,2,tx_data,PAGE_SIZE);
-
-AT45DBXX_BufferRead(&at45dbxx, 1,result);
-
-AT45DBXX_BufferRead(&at45dbxx, 2,result);
-
-AT45DBXX_BufferToPageER(&at45dbxx, 1, 1);
-
-AT45DBXX_BufferToPageER(&at45dbxx, 2, 2);
- *
- *
- *
- *
- *
- *
- *
- *
-AT45DBXX_ChipErase(&at45dbxx);
-
-memset(tx_data,0xBC,PAGE_SIZE);
-
-AT45DBXX_WriteMemory(&at45dbxx, 1, tx_data, PAGE_SIZE);
-
-memset(tx_data,0xCD,PAGE_SIZE);
-
-AT45DBXX_WriteMemory(&at45dbxx, 2, tx_data, PAGE_SIZE);
-
-memset(tx_data,0xDE,PAGE_SIZE);
-
-AT45DBXX_WriteMemory(&at45dbxx, 3, tx_data, PAGE_SIZE);
-
-for(int i = 0; i < 2; i++){
-	AT45DBXX_ReadMemory(&at45dbxx, 3, result);
-	Delay(500);
-	AT45DBXX_ReadMemory(&at45dbxx, 1, result);
-	Delay(500);
-	AT45DBXX_ReadMemory(&at45dbxx, 2, result);
-	Delay(500);
-}
-*/

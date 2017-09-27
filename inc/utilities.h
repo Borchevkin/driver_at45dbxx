@@ -12,6 +12,16 @@
 
 void Delay(uint32_t dlyTicks);
 void SysTick_Handler(void);
-void SetupUtilities(void);
+
+void Setup_Utilities(void);
+void spidrv_setup(void);
+
+void SPI1_Transfer(uint8_t *tx, uint8_t *rx, uint16_t num);
+
+void FLASH_SetWP(void);
+void FLASH_ClearWP(void);
+
+void FLASH_SetRESET(void);
+void FLASH_ClearRESET(void);
 
 #endif /* INC_UTILITIES_H_ */
