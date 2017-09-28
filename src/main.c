@@ -48,7 +48,7 @@ int main(void)
 	/*
 	AT45DBXX_EraseSectorProtection(&at45dbxx);
 
-	AT45DBXX_ProgramSectorProtection(&at45dbxx);
+	AT45DBXX_ProgramSectorProtection(&at45dbxx, 0);
 
 	FLASH_ClearWP();
 
