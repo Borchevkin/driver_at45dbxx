@@ -13,23 +13,23 @@
 /* ==========DEFINE========== */
 
 //Commands
-#define JEDEC_ID_CMD	0x9F
-#define PAGE_PROGRAM	0x82
-#define PAGE_ERASE		0x81
-#define READ_DATA		0xD2
-#define STATUS			0xD7
-#define BUF_1_READ		0xD4
-#define BUF_2_READ		0xD6
-#define BUF_1_WRITE		0x84
-#define BUF_2_WRITE		0x87
-#define BUF_1_PAGE_ER	0x83
-#define BUF_2_PAGE_ER	0x86
-#define BUF_1_PAGE_NER	0x88
-#define BUF_2_PAGE_NER	0x89
-#define PAGE_TO_BUF_1	0x53
-#define PAGE_TO_BUF_2	0x55
-#define BUF_1_COMP		0x60
-#define BUF_2_COMP		0x61
+#define JEDEC_ID_CMD	(0x9F)
+#define PAGE_PROGRAM	(0x82)
+#define PAGE_ERASE		(0x81)
+#define READ_DATA		(0xD2)
+#define STATUS			(0xD7)
+#define BUF_1_READ		(0xD4)
+#define BUF_2_READ		(0xD6)
+#define BUF_1_WRITE		(0x84)
+#define BUF_2_WRITE		(0x87)
+#define BUF_1_PAGE_ER	(0x83)
+#define BUF_2_PAGE_ER	(0x86)
+#define BUF_1_PAGE_NER	(0x88)
+#define BUF_2_PAGE_NER	(0x89)
+#define PAGE_TO_BUF_1	(0x53)
+#define PAGE_TO_BUF_2	(0x55)
+#define BUF_1_COMP		(0x60)
+#define BUF_2_COMP		(0x61)
 
 
 #define STATUS_RDY		(1 << 7) /* Bit 7: RDY/ Not BUSY */
@@ -37,19 +37,20 @@
 #define STATUS_PROTECT  (1 << 1) /* Bit 1: PROTECT */
 #define STATUS_PGSIZE   (1 << 0) /* Bit 0: PAGE_SIZE */
 
-#define PAGE_SIZE			264
-#define SPI_TRANSFER_SIZE 	PAGE_SIZE + 4  // Account for SPI header
+#define PAGE_SIZE			(264)
+#define SPI_TRANSFER_SIZE 	(PAGE_SIZE + 4)  // Account for SPI header
 
 /* ==========TYPES========== */
 
-typedef struct {
+typedef struct
+{
 	void (*SetWP)(void);
 	void (*ClearWP)(void);
 	void (*SetRESET)(void);
 	void (*ClearRESET)(void);
 	void (*SetupSPI)(void);
 	void (*Transfer)(uint8_t *tx, uint8_t *rx, uint16_t num);
-}at45dbxx_t;
+} at45dbxx_t;
 
 /* ==========PROTOTYPES========== */
 

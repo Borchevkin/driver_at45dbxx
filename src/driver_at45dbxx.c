@@ -43,8 +43,10 @@ void AT45DBXX_ChipErase(at45dbxx_t * at45dbxx)
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_PageErase(at45dbxx_t * at45dbxx, uint32_t address)
@@ -61,13 +63,15 @@ void AT45DBXX_PageErase(at45dbxx_t * at45dbxx, uint32_t address)
 	tx_data[0] = PAGE_ERASE;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result[])
@@ -82,7 +86,7 @@ void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result
 	tx_data[0] = READ_DATA;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, SPI_TRANSFER_SIZE);
 
@@ -92,7 +96,10 @@ void AT45DBXX_ReadMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t result
 
 void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_buffer[], uint32_t num_of_bytes)
 {
-	if (num_of_bytes > PAGE_SIZE) DEBUG_BREAK
+	if (num_of_bytes > PAGE_SIZE)
+	{
+		DEBUG_BREAK
+	}
 
 	uint8_t status;
 	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
@@ -106,19 +113,24 @@ void AT45DBXX_WriteMemory(at45dbxx_t * at45dbxx, uint32_t address, uint8_t data_
 	tx_data[0] = PAGE_PROGRAM;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	for (int i=0; i < PAGE_SIZE; i++)
 	{
-		if (i >= num_of_bytes) break;
+		if (i >= num_of_bytes)
+		{
+			break;
+		}
 		tx_data[i+4] = data_buffer[i];
 	}
 
 	at45dbxx->Transfer(&tx_data, &dummy_rx, SPI_TRANSFER_SIZE);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ConfigWrite(at45dbxx_t * at45dbxx, uint8_t command)
@@ -175,9 +187,21 @@ void AT45DBXX_BufferRead(at45dbxx_t * at45dbxx, uint8_t number, uint8_t result[]
 	memset(rx_data,0x00,SPI_TRANSFER_SIZE);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = BUF_1_READ;
-	if (number == 2)buff = BUF_2_READ;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = BUF_1_READ;
+	}
+
+	if (number == 2)
+	{
+		buff = BUF_2_READ;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	tx_data[0] = buff;
 	tx_data[1] = 0;
@@ -192,7 +216,10 @@ void AT45DBXX_BufferRead(at45dbxx_t * at45dbxx, uint8_t number, uint8_t result[]
 
 void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_buffer[], uint32_t num_of_bytes)
 {
-	if (num_of_bytes > PAGE_SIZE) DEBUG_BREAK
+	if (num_of_bytes > PAGE_SIZE)
+	{
+		DEBUG_BREAK
+	}
 
 	uint8_t dummy_rx[SPI_TRANSFER_SIZE];
 	uint8_t tx_data[SPI_TRANSFER_SIZE];  // Need room for cmd + three address bytes
@@ -201,9 +228,21 @@ void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_bu
 	memset(dummy_rx,0x00,SPI_TRANSFER_SIZE);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = BUF_1_WRITE;
-	if (number == 2)buff = BUF_2_WRITE;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = BUF_1_WRITE;
+	}
+
+	if (number == 2)
+	{
+		buff = BUF_2_WRITE;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	tx_data[0] = buff;
 	tx_data[1] = 0;
@@ -212,7 +251,10 @@ void AT45DBXX_BufferWrite(at45dbxx_t * at45dbxx, uint8_t number, uint8_t data_bu
 
 	for (int i=0; i < PAGE_SIZE; i++)
 	{
-		if (i >= num_of_bytes) break;
+		if (i >= num_of_bytes)
+		{
+			break;
+		}
 		tx_data[i+4] = data_buffer[i];
 	}
 
@@ -229,22 +271,36 @@ void AT45DBXX_BufferToPageER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t add
 	memset(rx_data,0x00,4);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = BUF_1_PAGE_ER;
-	if (number == 2)buff = BUF_2_PAGE_ER;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = BUF_1_PAGE_ER;
+	}
+
+	if (number == 2)
+	{
+		buff = BUF_2_PAGE_ER;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	uint32_t page = address << 1;
 
 	tx_data[0] = buff;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_BufferToPageNER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
@@ -257,22 +313,36 @@ void AT45DBXX_BufferToPageNER(at45dbxx_t * at45dbxx, uint8_t number, uint32_t ad
 	memset(rx_data,0x00,4);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = BUF_1_PAGE_NER;
-	if (number == 2)buff = BUF_2_PAGE_NER;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = BUF_1_PAGE_NER;
+	}
+
+	if (number == 2)
+	{
+		buff = BUF_2_PAGE_NER;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	uint32_t page = address << 1;
 
 	tx_data[0] = buff;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_PageToBufferTransfer(at45dbxx_t * at45dbxx, uint8_t number, uint32_t address)
@@ -283,16 +353,28 @@ void AT45DBXX_PageToBufferTransfer(at45dbxx_t * at45dbxx, uint8_t number, uint32
 	memset(rx_data,0x00,4);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = PAGE_TO_BUF_1;
-	if (number == 2)buff = PAGE_TO_BUF_2;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = PAGE_TO_BUF_1;
+	}
+
+	if (number == 2)
+	{
+		buff = PAGE_TO_BUF_2;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	uint32_t page = address << 1;
 
 	tx_data[0] = buff;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 }
@@ -307,22 +389,36 @@ void AT45DBXX_PageToBufferCompare(at45dbxx_t * at45dbxx, uint8_t number, uint32_
 	memset(rx_data,0x00,4);
 
 	uint8_t buff = 0;
-	if (number == 1)buff = BUF_1_COMP;
-	if (number == 2)buff = BUF_2_COMP;
-	if (number < 1 || number > 2) DEBUG_BREAK
+
+	if (number == 1)
+	{
+		buff = BUF_1_COMP;
+	}
+
+	if (number == 2)
+	{
+		buff = BUF_2_COMP;
+	}
+
+	if (number < 1 || number > 2)
+	{
+		DEBUG_BREAK
+	}
 
 	uint32_t page = address << 1;
 
 	tx_data[0] = buff;
 	tx_data[1] = (page >> 8)	& 0xff;
 	tx_data[2] = (page)			& 0xff;
-	tx_data[3] = 0; //page			& 0xff;
+	tx_data[3] = 0;
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_EnableSectorProtection(at45dbxx_t * at45dbxx)
@@ -372,8 +468,10 @@ void AT45DBXX_EraseSectorProtection(at45dbxx_t * at45dbxx)
 	at45dbxx->Transfer(&tx_data, &rx_data, 4);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ProgramSectorProtection(at45dbxx_t * at45dbxx, uint8_t sector)
@@ -390,6 +488,7 @@ void AT45DBXX_ProgramSectorProtection(at45dbxx_t * at45dbxx, uint8_t sector)
 	tx_data[2] = 0x7F;
 	tx_data[3] = 0xFC;
 
+	//TODO Rework
 	if (sector == 0)
 	tx_data[4] = 0xF0;
 	if (sector == 1)
@@ -406,13 +505,18 @@ void AT45DBXX_ProgramSectorProtection(at45dbxx_t * at45dbxx, uint8_t sector)
 	tx_data[10] = 0xFF;
 	if (sector == 7)
 	tx_data[11] = 0xFF;
-	if (sector < 0 || sector > 7) DEBUG_BREAK
+	if (sector < 0 || sector > 7)
+	{
+		DEBUG_BREAK
+	}
 
 	at45dbxx->Transfer(&tx_data, &rx_data, 12);
 
 	//TODO Make non-block
-	do status = AT45DBXX_ReadStatus(at45dbxx);
-	while (!(status & STATUS_RDY));
+	do
+	{
+		status = AT45DBXX_ReadStatus(at45dbxx);
+	} while (!(status & STATUS_RDY));
 }
 
 void AT45DBXX_ReadSectorProtection(at45dbxx_t * at45dbxx)

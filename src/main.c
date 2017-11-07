@@ -23,10 +23,7 @@ int main(void)
 
 	spidrv_setup();
 
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
-	{
-		DEBUG_BREAK;
-	}
+	SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000);
 
 	Setup_Utilities();
 
@@ -60,7 +57,8 @@ int main(void)
 	*/
 	// ===========================
 
-	while(1){
+	while(1)
+	{
 		AT45DBXX_ReadMemory(&at45dbxx, 1, result);
 		Delay(500);
 		AT45DBXX_ReadMemory(&at45dbxx, 2, result);
