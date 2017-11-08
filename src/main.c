@@ -21,21 +21,21 @@ int main(void)
 {
 	CHIP_Init();
 
-	spidrv_setup();
+	SPIDRV_Setup();
 
 	SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000);
 
-	Setup_Utilities();
+	SETUP_Utilities();
 
 	AT45DBXX_Init(&at45dbxx);
 
 	Delay(100);
 
-	uint8_t result[PAGE_SIZE];
-	uint8_t tx_data[PAGE_SIZE];
+	uint8_t result[AT45DBXX_PAGE_SIZE];
+	uint8_t tx_data[AT45DBXX_PAGE_SIZE];
 
-	memset(tx_data,0x00,PAGE_SIZE);
-	memset(result,0x00,PAGE_SIZE);
+	memset(tx_data,0x00,AT45DBXX_PAGE_SIZE);
+	memset(result,0x00,AT45DBXX_PAGE_SIZE);
 
 	AT45DBXX_CheckID(&at45dbxx);
 

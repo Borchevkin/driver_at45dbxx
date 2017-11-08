@@ -13,8 +13,8 @@
 void Delay(uint32_t dlyTicks);
 void SysTick_Handler(void);
 
-void Setup_Utilities(void);
-void spidrv_setup(void);
+void SETUP_Utilities(void);
+void SPIDRV_Setup(void);
 
 void SPI1_Transfer(uint8_t *tx, uint8_t *rx, uint16_t num);
 

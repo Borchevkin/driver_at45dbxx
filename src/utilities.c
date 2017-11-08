@@ -21,7 +21,7 @@
 SPIDRV_HandleData_t handleData;
 SPIDRV_Handle_t handle = &handleData;
 
-void spidrv_setup(void)
+void SPIDRV_Setup(void)
 {
 	// Set up the necessary peripheral clocks
 	CMU_ClockEnable(cmuClock_GPIO, true);
@@ -60,7 +60,7 @@ void SysTick_Handler(void)
       msTicks++;
 }
 
-void Setup_Utilities(void)
+void SETUP_Utilities(void)
 {
 	USART_IntClear(USART1, USART_IF_TXC);
 	USART_IntEnable(USART1, USART_IF_TXC);
