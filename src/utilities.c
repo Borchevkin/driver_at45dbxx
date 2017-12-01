@@ -60,7 +60,7 @@ void SysTick_Handler(void)
       msTicks++;
 }
 
-void SETUP_Utilities(void)
+void SetupUtilities(void)
 {
 	USART_IntClear(USART1, USART_IF_TXC);
 	USART_IntEnable(USART1, USART_IF_TXC);

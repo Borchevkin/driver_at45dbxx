@@ -25,7 +25,7 @@ int main(void)
 
 	SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000);
 
-	SETUP_Utilities();
+	SetupUtilities();
 
 	AT45DBXX_Init(&at45dbxx);
 
